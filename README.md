@@ -15,6 +15,8 @@ PAI Universal (Personal AI Infrastructure) is a goal-oriented AI assistant frame
 | Claude Code | ✓ Active | ✓ | Reads history.jsonl + MEMORY/WORK |
 | Codex | ✓ Active | ✓ | Reads logs_1.sqlite |
 | Cursor | ✓ Active | ✓ | Same DB format as Codex |
+| pi-go | ✓ Active | ✓ | Go rewrite of pi-mono |
+| pi-mono | Reference | - | https://github.com/badlogic/pi-mono |
 | Gemini CLI | Future | - | Not yet used |
 
 ## Session Analyzer
@@ -52,6 +54,7 @@ go run ./cmd/session-analyzer -all=false -opencode
 - Claude Code: `~/.claude/MEMORY/WORK/insights-*.md`
 - opencode: `~/.local/share/opencode/storage/memory/insights-*.md`
 - Codex/Cursor: Same format as Claude
+- pi-go: `~/.local/share/pi-go/memory/insights-*.md`
 
 ### Configuration
 - `PAI_BASE_DIR` - Override default (default: `~/src/Code/pai-universal`)

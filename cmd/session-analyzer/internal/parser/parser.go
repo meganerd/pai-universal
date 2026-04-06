@@ -6,6 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -184,6 +187,13 @@ func ParseAll(cfg *config.Config) ([]Session, error) {
 		}
 	}
 
+	// Parse pi-go sessions
+	if cfg.PigoPath != "" {
+		if sessions, err := ParsePigo(cfg.PigoPath); err == nil && len(sessions) > 0 {
+			allSessions = append(allSessions, sessions...)
+		}
+	}
+
 	return allSessions, nil
 }
 
@@ -281,6 +291,62 @@ func ParseCodex(dbPath string) ([]Session, error) {
 			Prompt:    body,
 			Type:      "codex",
 		})
+	}
+
+	return sessions, nil
+}
+
+func ParsePigo(pigoDir string) ([]Session, error) {
+	// Parse pi-go sessions from ~/.local/share/pi-go/sessions
+	home, _ := os.UserHomeDir()
+	sessionsDir := filepath.Join(home, ".local", "share", "pi-go", "sessions")
+
+	entries, err := os.ReadDir(sessionsDir)
+	if err != nil {
+		return nil, err
+	}
+
+	var sessions []Session
+	for _, entry := range entries {
+		if !strings.HasSuffix(entry.Name(), ".jsonl") {
+			continue
+		}
+
+		path := filepath.Join(sessionsDir, entry.Name())
+		file, err := os.Open(path)
+		if err != nil {
+			continue
+		}
+
+		// Extract timestamp from filename (format: 1773081361658587.jsonl)
+		ts, err := strconv.ParseInt(strings.TrimSuffix(entry.Name(), ".jsonl"), 10, 64)
+		if err != nil {
+			ts = time.Now().Unix()
+		}
+
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			var msg map[string]interface{}
+			if err := json.Unmarshal(scanner.Bytes(), &msg); err != nil {
+				continue
+			}
+
+			// Extract prompt from user messages
+			role, _ := msg["role"].(string)
+			content, _ := msg["content"].(string)
+
+			if role == "user" && content != "" {
+				sessions = append(sessions, Session{
+					ID:        entry.Name(),
+					Timestamp: time.UnixMilli(ts / 1000),
+					Project:   pigoDir,
+					Prompt:    content,
+					Type:      "pi-go",
+				})
+				break // Only take first user message per session
+			}
+		}
+		file.Close()
 	}
 
 	return sessions, nil

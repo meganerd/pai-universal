@@ -13,6 +13,7 @@ type Config struct {
 	CodexPath         string `json:"codex_path"`
 	CursorPath        string `json:"cursor_path"`
 	GeminiPath        string `json:"gemini_path"`
+	PigoPath          string `json:"pigo_path"`
 	LLMProvider       string `json:"llm_provider"`
 	LLMModel          string `json:"llm_model"`
 	LLMAPIKey         string `json:"llm_api_key"`
@@ -29,6 +30,7 @@ func Default() *Config {
 		CodexPath:         filepath.Join(home, ".codex", "logs_1.sqlite"),
 		CursorPath:        "",
 		GeminiPath:        "",
+		PigoPath:          filepath.Join(home, "src", "Code", "pi-go"),
 		LLMProvider:       "openrouter",
 		LLMModel:          "google/gemini-2.0-flash-001",
 		AnthropicKey:      os.Getenv("ANTHROPIC_API_KEY"),

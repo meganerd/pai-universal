@@ -6,6 +6,8 @@
 - Port PAI to opencode (pai-universal project)
 - Set up GitLab → GitHub mirror workflow
 - Fill out TELOS files
+- Develop pi-go (Go reimplementation of pi-mono)
+- Track pi-mono upstream for reference patterns
 
 ### Medium-term (This year)
 - Master AI/ML concepts and build AI products

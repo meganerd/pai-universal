@@ -28,6 +28,7 @@ var (
 	flagUpdateCodex    bool
 	flagUpdateCursor   bool
 	flagUpdateGemini   bool
+	flagUpdatePigo     bool
 )
 
 func main() {
@@ -43,6 +44,7 @@ func main() {
 	flag.BoolVar(&flagUpdateCodex, "codex", false, "Update Codex memory")
 	flag.BoolVar(&flagUpdateCursor, "cursor", false, "Update Cursor memory")
 	flag.BoolVar(&flagUpdateGemini, "gemini", false, "Update Gemini CLI memory")
+	flag.BoolVar(&flagUpdatePigo, "pigo", false, "Update pi-go memory")
 
 	cfg, err := config.Load(flagConfig)
 	if err != nil {
@@ -126,6 +128,9 @@ func main() {
 		}
 		if flagUpdateGemini {
 			targets = append(targets, "gemini")
+		}
+		if flagUpdatePigo {
+			targets = append(targets, "pigo")
 		}
 	}
 

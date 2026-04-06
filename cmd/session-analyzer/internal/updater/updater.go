@@ -135,6 +135,13 @@ func (u *Updater) Apply(insights []llm.Insight) error {
 		}
 	}
 
+	// Update pi-go memory
+	if u.shouldUpdate("pigo") {
+		if err := u.updatePigoMemory(insights); err != nil {
+			return fmt.Errorf("pi-go memory update failed: %w", err)
+		}
+	}
+
 	return nil
 }
 
@@ -301,6 +308,39 @@ func (u *Updater) updateOpencodeMemory(insights []llm.Insight) error {
 	dest := filepath.Join(opencodeMemoryPath, filename)
 	if u.dryRun {
 		fmt.Printf("Would update opencode memory: %s\n", dest)
+	} else {
+		return os.WriteFile(dest, []byte(content), 0644)
+	}
+	return nil
+}
+
+// updatePigoMemory writes insights to pi-go's session memory format
+func (u *Updater) updatePigoMemory(insights []llm.Insight) error {
+	home, _ := os.UserHomeDir()
+	pigoMemoryPath := filepath.Join(home, ".local", "share", "pi-go", "memory")
+
+	if err := os.MkdirAll(pigoMemoryPath, 0755); err != nil {
+		return err
+	}
+
+	filename := fmt.Sprintf("insights-%s.md", time.Now().Format("20060102"))
+	content := "# Session Insights\n\n"
+	content += fmt.Sprintf("Generated: %s\n\n", time.Now().Format("2006-01-02 15:04"))
+	content += "Source: PAI Universal Session Analyzer\n\n"
+
+	for _, insight := range insights {
+		content += fmt.Sprintf("## %s: %s\n", insight.Type, insight.Category)
+		content += fmt.Sprintf("**Confidence**: %.0f%%\n\n", insight.Description)
+		content += "**Evidence:**\n"
+		for _, e := range insight.Evidence {
+			content += fmt.Sprintf("- %s\n", e)
+		}
+		content += "\n---\n\n"
+	}
+
+	dest := filepath.Join(pigoMemoryPath, filename)
+	if u.dryRun {
+		fmt.Printf("Would update pi-go memory: %s\n", dest)
 	} else {
 		return os.WriteFile(dest, []byte(content), 0644)
 	}
