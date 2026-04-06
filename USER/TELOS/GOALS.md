@@ -22,3 +22,11 @@
 ---
 
 *Last updated: 2025-04-06*
+
+
+## Inferred from Sessions
+*Last updated: 2026-04-06*
+
+- [Scalability] Aims to improve the scalability and robustness of his AI infrastructure.
+- [Infrastructure as Code (IaC)] Automating infrastructure management using tools like Terraform/Opentofu and Ansible.
+- [Cost Reduction] Reduce cloud costs via optimising local services so to minimise the usage of tokens on pay per use frontier models.
