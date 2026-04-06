@@ -1,0 +1,43 @@
+# Binaries
+pai-opencode
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# PAI specific
+.beads/*.db
+.beads/*.jsonl
+USER/Memory/
+MEMORY/*
+!MEMORY/hot/.gitkeep
+!MEMORY/warm/.gitkeep
+!MEMORY/cold/.gitkeep
+
+# Build output
+dist/
+
+# Secrets
+.env
+*.pem
+*.key

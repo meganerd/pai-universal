@@ -1,0 +1,23 @@
+{
+  "identity": {
+    "name": "",
+    "aiName": "Assistant",
+    "temperatureUnit": "fahrenheit"
+  },
+  "preferences": {
+    "techStack": [],
+    "preferredTools": [],
+    "communicationStyle": "concise"
+  },
+  "notifications": {
+    "enabled": false,
+    "ntfyUrl": "",
+    "discordWebhook": ""
+  },
+  "voice": {
+    "enabled": false,
+    "elevenLabsApiKey": "",
+    "voiceId": ""
+  },
+  "version": "0.1.0-alpha"
+}
