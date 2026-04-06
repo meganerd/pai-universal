@@ -1,11 +1,21 @@
-# PAI OpenCode - CLAUDE.md
+# PAI Universal - CLAUDE.md
 
 **Version:** 0.1.0-alpha  
-**Purpose:** Personal AI Infrastructure for opencode
+**Purpose:** Universal Personal AI Infrastructure supporting multiple AI tools
 
 ## Project Overview
 
-This is a port of [PAI](https://github.com/danielmiessler/Personal_AI_Infrastructure) to work with opencode instead of Claude Code.
+This is PAI (Personal AI Infrastructure) adapted to work with multiple AI tools, starting with opencode.
+
+## Supported AI Tools
+
+| Tool | Status | Notes |
+|------|--------|-------|
+| opencode | ✓ Primary | Native skill system |
+| Claude Code | Legacy | Original PAI |
+| Cursor | Planned | Future support |
+| Codex | Planned | Future support |
+| Gemini CLI | Planned | Future support |
 
 ## Key Differences from Claude Code PAI
 

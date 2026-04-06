@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-# PAI OpenCode Installation Script
-# ===============================
+# PAI Universal Installation Script
+# ==================================
 
-echo "PAI OpenCode Installation"
-echo "========================"
+echo "PAI Universal Installation"
+echo "=========================="
 echo
 
 # Check prerequisites
@@ -28,7 +28,7 @@ echo
 
 # Detect installation location
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PAI_DIR="${HOME}/.pai-opencode"
+PAI_DIR="${HOME}/.pai-universal"
 
 echo "Installation directory: ${PAI_DIR}"
 echo
@@ -72,7 +72,7 @@ echo
 
 # Print completion message
 echo "======================================"
-echo "PAI OpenCode installed successfully!"
+echo "PAI Universal installed successfully!"
 echo "======================================"
 echo
 echo "Next steps:"

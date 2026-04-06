@@ -1,19 +1,29 @@
-# Personal AI Infrastructure for opencode
+# PAI Universal - Personal AI Infrastructure
 
 **Version:** 0.1.0-alpha  
 **Status:** Phase 1 - Infrastructure Port
 
 ## Overview
 
-PAI (Personal AI Infrastructure) for opencode is a goal-oriented AI assistant framework that learns and improves over time. Unlike stateless AI assistants, PAI knows your goals, remembers your preferences, and continuously improves its understanding of how you work.
+PAI Universal (Personal AI Infrastructure) is a goal-oriented AI assistant framework that works across multiple AI tools. Unlike stateless AI assistants, PAI knows your goals, remembers your preferences, and continuously improves its understanding of how you work.
+
+### Supported AI Tools
+
+| Tool | Status | Notes |
+|------|--------|-------|
+| opencode | ✓ Primary | Native skill system |
+| Claude Code | Legacy | Original PAI |
+| Cursor | Planned | Future support |
+| Codex | Planned | Future support |
+| Gemini CLI | Planned | Future support |
 
 ## Architecture
 
 ### Directory Structure
 
 ```
-Personal_AI_Infrastructure/
-├── cmd/pai-opencode/     # Go CLI wrapper
+pai-universal/
+├── cmd/pai-universal/    # Go CLI wrapper
 ├── lib/                   # Core libraries
 ├── hooks/                 # Lifecycle hooks
 ├── skills/                # Skill definitions (opencode format)
@@ -49,7 +59,7 @@ Personal_AI_Infrastructure/
 ### Building
 
 ```bash
-go build -o pai-opencode ./cmd/pai-opencode/
+go build -o pai-universal ./cmd/pai-universal/
 ```
 
 ### Testing

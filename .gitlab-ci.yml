@@ -20,5 +20,5 @@ include:
 variables:
   GO_IMAGE: "golang:1.26"
   GOLANGCI_LINT_IMAGE: "golangci/golangci-lint:v2.11"
-  GO_BUILD_PATH: "./cmd/pai-opencode/"
-  GO_BINARY_NAME: "pai-opencode"
+  GO_BUILD_PATH: "./cmd/pai-universal/"
+  GO_BINARY_NAME: "pai-universal"
