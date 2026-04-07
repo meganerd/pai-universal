@@ -1,55 +1,30 @@
-# Hooks for PAI OpenCode
+# PAI Hooks
 
-This directory contains lifecycle hooks for PAI OpenCode.
+This directory contains hooks and utilities for integrating PAI with various AI tools.
 
-## Available Hooks
+## Session Logging
 
-Since opencode doesn't have the same hook system as Claude Code, hooks are implemented as:
-
-1. **Pre-session hooks** — Run before opencode starts
-2. **Post-session hooks** — Run after opencode completes
-
-## Hook Implementation
-
-Hooks are implemented in `lib/` as shell scripts or Go utilities.
-
-### Session Start Hook
-```bash
-# hooks/session-start.sh
-#!/bin/bash
-# Load context files, initialize memory, etc.
-```
-
-### Tool Use Hook
-```bash
-# hooks/tool-use.sh
-#!/bin/bash
-# Called after each tool use for logging/validation
-```
-
-## Example: Loading TELOS Context
+Use the `log-session.sh` script to log current session work:
 
 ```bash
-#!/bin/bash
-# Load TELOS files into context
-TELOS_DIR="${HOME}/.pai-opencode/USER/TELOS"
-
-if [ -d "$TELOS_DIR" ]; then
-    for file in MISSION.md GOALS.md PROJECTS.md BELIEFS.md; do
-        if [ -f "${TELOS_DIR}/${file}" ]; then
-            echo "Loading ${file}..."
-            # Add to opencode context
-        fi
-    done
-fi
+./tools/log-session.sh "Working on feature X"
 ```
 
-## Security Hooks
+This creates a session file in `MEMORY/warm/` that can be picked up by the session analyzer.
 
-The security hook validates commands before execution:
+## Opencode Integration
+
+PAI skills are automatically available to opencode when working in the pai-universal project directory. The skill is defined in `skills/PAI/SKILL.md`.
+
+## Session Analyzer Integration
+
+After sessions are logged to MEMORY/warm/, run the session analyzer to extract insights:
 
 ```bash
-#!/bin/bash
-# hooks/security.sh
-# Validate dangerous commands
+go run ./cmd/session-analyzer
 ```
+
+This will:
+1. Parse all session files in MEMORY/work and MEMORY/warm
+2. Extract insights via LLM
+3. Update memory files and TELOS in USER/TELOS/
