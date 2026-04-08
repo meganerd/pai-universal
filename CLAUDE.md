@@ -1,11 +1,23 @@
 # PAI Universal - CLAUDE.md
 
-**Version:** 0.1.0-alpha  
+**Version:** 0.6.0
 **Purpose:** Universal Personal AI Infrastructure supporting multiple AI tools
 
 ## Project Overview
 
 This is PAI (Personal AI Infrastructure) adapted to work with multiple AI tools, starting with opencode.
+
+## The Algorithm
+
+**Read `Algorithm/v3.5.0.md` before any substantial work.**
+
+The Algorithm is the core decision-making framework. It defines:
+- Effort levels (Standard, Extended, Advanced, Deep, Comprehensive)
+- 7 phases: Observe, Reverse Engineer, Criteria, Decide, Execute, Verify, Complete
+- ISC (Ideal State Criteria) decomposition methodology
+- Voice notifications for phase transitions
+
+**Usage:** For any non-trivial task, apply the Algorithm. It transforms requests into verifiable criteria and executes through structured phases.
 
 ## Supported AI Tools
 
