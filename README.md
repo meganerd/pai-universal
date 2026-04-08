@@ -1,13 +1,40 @@
 # PAI Universal - Personal AI Infrastructure
 
-**Version:** 0.5.0  
-**Status:** Session Analyzer + Multi-harness Support
+**Version:** 0.6.0  
+**Status:** Full PAI with multi-harness support
 
 ## Overview
 
-PAI Universal (Personal AI Infrastructure) is a goal-oriented AI assistant framework that works across multiple AI tools. Unlike stateless AI assistants, PAI knows your goals, remembers your preferences, and continuously improves its understanding of how you work.
+PAI Universal (Personal AI Infrastructure) brings the PAI system to work with multiple AI tools. It includes the Algorithm, session management, complexity tracking, and cross-harness sync.
 
-### Supported AI Tools
+## IMPORTANT: Differences from Claude Code PAI
+
+If you're coming from Claude Code PAI, here are the key differences:
+
+### What's the Same
+- **The Algorithm** - Still available, must manually request it (say "Use the Algorithm")
+- **TELOS files** - Goals, projects, mission, beliefs all work the same
+- **Skills** - All PAI skill packs available (Research, Security, etc.)
+- **Memory system** - 3-tier hot/warm/cold structure
+- **Session analyzer** - Extracts insights from session history
+
+### What's Different (Requires Manual Action)
+
+| Claude Code PAI | PAI Universal (opencode) |
+|-----------------|--------------------------|
+| Algorithm auto-triggers on complexity | Must say "Use the Algorithm" |
+| Voice notifications work | Must set up voice server separately |
+| Hooks run automatically | Hooks run via pai-opencode wrapper |
+| Context loads automatically | CLAUDE.md provides context |
+
+### Workflow
+1. Launch with `pai-opencode` (wrapper that runs session-start hook)
+2. Tell me what you want to work on
+3. For complex tasks, say "Use the Algorithm" to trigger formal process
+4. Run `go run ./cmd/session-analyzer` periodically to capture learnings
+5. Use `go run ./cmd/session-sync` to share context between harnesses
+
+## Supported AI Tools
 
 | Tool | Status | Memory Sync | Notes |
 |------|--------|-------------|-------|
@@ -19,53 +46,102 @@ PAI Universal (Personal AI Infrastructure) is a goal-oriented AI assistant frame
 | pi-mono | Reference | - | https://github.com/badlogic/pi-mono |
 | Gemini CLI | Future | - | Not yet used |
 
-## Session Analyzer
+## Installation
 
-A tool to ingest session logs from various AI tools and extract learnings, preferences, and patterns to update memory, goals, and beliefs.
-
-### Why use it?
-- **Capture learnings** - Periodically extract what you've done across all AI tools
-- **Compare tools** - See what you do in each harness
-- **Multi-harness workflow** - Keep context when switching between tools
-
-### Quick Start
 ```bash
-# Build all tools
-go build ./...
-
-# Run session analyzer (updates all harnesses by default)
-go run ./cmd/session-analyzer
-
-# Preview what would change
-go run ./cmd/session-analyzer --dry-run -v
-
-# Update specific harnesses only
-go run ./cmd/session-analyzer -all=false -opencode
+# Add to ~/.bash_aliases_local:
+alias pai-opencode='bash ~/src/Code/pai-universal/tools/pai.sh'
 ```
 
-### Output Targets
+Then use `pai-opencode` to launch opencode with PAI context.
 
-**pai-universal (local):**
-- `MEMORY/cold/insights-YYYYMMDD.md` - New learnings
-- `USER/TELOS/GOALS.md` - Inferred goals
-- `USER/TELOS/BELIEFS.md` - Technology preferences
+## CLI Tools
 
-**Harnesses:**
-- Claude Code: `~/.claude/MEMORY/WORK/insights-*.md`
-- opencode: `~/.local/share/opencode/storage/memory/insights-*.md`
-- Codex/Cursor: Same format as Claude
-- pi-go: `~/.local/share/pi-go/memory/insights-*.md`
+### session-analyzer (Periodic)
+Analyzes past sessions from all harnesses and extracts insights using LLM.
 
-### Configuration
-- `PAI_BASE_DIR` - Override default (default: `~/src/Code/pai-universal`)
-- `OPENROUTER_API_KEY` - Required for LLM analysis
-- `-model` - Set LLM model (default: `google/gemini-2.0-flash-001`)
-- `-siftrank` - Use siftrank for auto model selection
+```bash
+go run ./cmd/session-analyzer          # Analyze and update all
+go run ./cmd/session-analyzer --dry-run -v  # Preview changes
+go run ./cmd/session-analyzer -siftrank      # Auto-select best model
+go run ./cmd/session-analyzer -all=false -opencode  # Specific harness
+```
 
-### Notes
-- This is an occasional/periodic tool, not for every session
-- Source data is read-only; creates new insight files
-- Handles missing sources gracefully
+### session-manager (Per-Session)
+Complexity detection for current task. Helps determine when to use the Algorithm.
+
+```bash
+# Score a prompt
+go run ./cmd/session-manager -m "create a new web server" -score
+
+# Show current task complexity
+go run ./cmd/session-manager
+```
+
+**Complexity Thresholds:**
+| Score | Level | Action |
+|-------|-------|--------|
+| 0-3 | Standard | Normal mode |
+| 4-8 | Extended | Break into smaller tasks |
+| 9-16 | Advanced | Use Algorithm (create PRD) |
+| 17+ | Deep | Use Algorithm (full ISC breakdown) |
+
+### session-sync (Cross-Harness)
+Sync session context between different AI tools.
+
+```bash
+# Sync from one harness to others
+go run ./cmd/session-sync --source opencode --target claude,pigo
+go run ./cmd/session-sync --source claude --target opencode --dry-run
+```
+
+### notify (Notifications)
+Multi-backend notification tool.
+
+```bash
+# Voice (requires voice server)
+./tools/notify.sh "Task complete"
+
+# System notification
+NOTIFY_MODE=system ./tools/notify.sh "Done"
+```
+
+## Session Hooks
+
+Hooks run automatically when using `pai-opencode`:
+
+- **session-start.sh** - Shows goals, projects, recent sessions, complexity info
+- **session-end.sh** - Logs session summary to MEMORY/warm/
+
+## Manual Session Logging
+
+```bash
+# Log current work
+./tools/log-session.sh "Working on feature X"
+```
+
+## The Algorithm
+
+Located in `Algorithm/v3.5.0.md`. For substantial tasks:
+
+1. Say "Use the Algorithm" or "Read Algorithm/v3.5.0.md and apply it"
+2. I'll follow the 7-phase process: Observe → Reverse Engineer → Criteria → Decide → Execute → Verify → Complete
+3. ISC (Ideal State Criteria) breakdown for verifiable goals
+
+## Memory Structure
+
+```
+MEMORY/
+├── hot/          # Current session files
+├── warm/         # Recent sessions (parsed by session-analyzer)
+└── cold/          # Long-term learnings, patterns
+
+USER/TELOS/
+├── MISSION.md     # Life purpose
+├── GOALS.md       # Goal tracking
+├── PROJECTS.md    # Active projects
+└── BELIEFS.md     # Core beliefs and preferences
+```
 
 ## License
 
