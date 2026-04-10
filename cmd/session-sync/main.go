@@ -14,6 +14,7 @@ var (
 	flagVerbose bool
 	flagSource  string
 	flagTarget  string
+	flagBackup  bool
 )
 
 func main() {
@@ -21,12 +22,22 @@ func main() {
 	flag.BoolVar(&flagVerbose, "v", false, "Verbose output")
 	flag.StringVar(&flagSource, "source", "", "Source harness (claude, opencode, codex, cursor, pigo)")
 	flag.StringVar(&flagTarget, "target", "", "Target harness (comma-separated: claude,opencode,etc)")
+	flag.BoolVar(&flagBackup, "backup", false, "Backup sessions to backup directory")
 	flag.Parse()
 
 	baseDir := os.Getenv("PAI_BASE_DIR")
 	if baseDir == "" {
 		home, _ := os.UserHomeDir()
 		baseDir = filepath.Join(home, "src", "Code", "pai-universal")
+	}
+
+	// Backup mode - export all harness sessions to backup directory
+	if flagBackup {
+		if err := backupAllSessions(baseDir, flagDryRun); err != nil {
+			log.Fatalf("Backup failed: %v", err)
+		}
+		fmt.Println("Backup complete")
+		return
 	}
 
 	if flagSource == "" || flagTarget == "" {
@@ -214,4 +225,107 @@ func getTargetMemoryPath(target, baseDir string) string {
 	default:
 		return filepath.Join(baseDir, "MEMORY", "warm")
 	}
+}
+
+func backupAllSessions(baseDir string, dryRun bool) error {
+	home, _ := os.UserHomeDir()
+	backupDir := filepath.Join(baseDir, "backups", time.Now().Format("20060102-150405"))
+
+	if flagVerbose {
+		fmt.Printf("Backup directory: %s\n", backupDir)
+	}
+
+	if dryRun {
+		fmt.Println("Would create backup directory and copy sessions")
+		return nil
+	}
+
+	if err := os.MkdirAll(backupDir, 0755); err != nil {
+		return err
+	}
+
+	// Sources to backup
+	sources := map[string]string{
+		"claude-history": filepath.Join(home, ".claude", "history.jsonl"),
+		"claude-memory":  filepath.Join(home, ".claude", "MEMORY", "WORK"),
+		"opencode":       filepath.Join(home, ".local", "share", "opencode", "opencode.db"),
+		"codex":          filepath.Join(home, ".codex", "logs_1.sqlite"),
+		"pigo":           filepath.Join(home, ".local", "share", "pi-go", "sessions"),
+		"pai-warm":       filepath.Join(baseDir, "MEMORY", "warm"),
+		"pai-cold":       filepath.Join(baseDir, "MEMORY", "cold"),
+	}
+
+	for name, path := range sources {
+		if _, err := os.Stat(path); err != nil {
+			if flagVerbose {
+				fmt.Printf("Skipping %s: not found\n", name)
+			}
+			continue
+		}
+
+		dest := filepath.Join(backupDir, name)
+		if err := copyDir(path, dest); err != nil {
+			if flagVerbose {
+				fmt.Printf("Warning: Failed to backup %s: %v\n", name, err)
+			}
+		} else if flagVerbose {
+			fmt.Printf("Backed up: %s\n", name)
+		}
+	}
+
+	// Write backup manifest
+	manifest := fmt.Sprintf("# Backup Manifest\n\nTimestamp: %s\nSources backed up:\n", time.Now().Format("2006-01-02 15:04"))
+	for name := range sources {
+		manifest += fmt.Sprintf("- %s\n", name)
+	}
+	os.WriteFile(filepath.Join(backupDir, "manifest.md"), []byte(manifest), 0644)
+
+	return nil
+}
+
+func copyDir(src, dest string) error {
+	info, err := os.Stat(src)
+	if err != nil {
+		return err
+	}
+
+	if info.IsDir() {
+		return copyDirRecursive(src, dest)
+	}
+	return copyFile(src, dest)
+}
+
+func copyDirRecursive(src, dest string) error {
+	entries, err := os.ReadDir(src)
+	if err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll(dest, 0755); err != nil {
+		return err
+	}
+
+	for _, entry := range entries {
+		srcPath := filepath.Join(src, entry.Name())
+		destPath := filepath.Join(dest, entry.Name())
+
+		if entry.IsDir() {
+			if err := copyDirRecursive(srcPath, destPath); err != nil {
+				return err
+			}
+		} else {
+			if err := copyFile(srcPath, destPath); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func copyFile(src, dest string) error {
+	data, err := os.ReadFile(src)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(dest, data, 0644)
 }
