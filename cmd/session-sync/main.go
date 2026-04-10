@@ -253,6 +253,11 @@ func backupAllSessions(baseDir string, dryRun bool) error {
 		"pigo":           filepath.Join(home, ".local", "share", "pi-go", "sessions"),
 		"pai-warm":       filepath.Join(baseDir, "MEMORY", "warm"),
 		"pai-cold":       filepath.Join(baseDir, "MEMORY", "cold"),
+		"user-telos":     filepath.Join(baseDir, "USER", "TELOS"),
+		"user-settings":  filepath.Join(baseDir, "USER", "Settings"),
+		"user-memory":    filepath.Join(baseDir, "USER", "Memory"),
+		"user-hooks":     filepath.Join(baseDir, "USER", "Hooks"),
+		"user-skills":    filepath.Join(baseDir, "USER", "Skills"),
 	}
 
 	for name, path := range sources {
