@@ -10,11 +10,12 @@ import (
 )
 
 var (
-	flagDryRun  bool
-	flagVerbose bool
-	flagSource  string
-	flagTarget  string
-	flagBackup  bool
+	flagDryRun   bool
+	flagVerbose  bool
+	flagSource   string
+	flagTarget   string
+	flagBackup   bool
+	flagSyncUser bool
 )
 
 func main() {
@@ -23,6 +24,7 @@ func main() {
 	flag.StringVar(&flagSource, "source", "", "Source harness (claude, opencode, codex, cursor, pigo)")
 	flag.StringVar(&flagTarget, "target", "", "Target harness (comma-separated: claude,opencode,etc)")
 	flag.BoolVar(&flagBackup, "backup", false, "Backup sessions to backup directory")
+	flag.BoolVar(&flagSyncUser, "sync-user", false, "Sync USER directory to target harnesses")
 	flag.Parse()
 
 	baseDir := os.Getenv("PAI_BASE_DIR")
@@ -37,6 +39,18 @@ func main() {
 			log.Fatalf("Backup failed: %v", err)
 		}
 		fmt.Println("Backup complete")
+		return
+	}
+
+	// Sync USER directory to target harnesses
+	if flagSyncUser {
+		if flagTarget == "" {
+			log.Fatal("--target is required for -sync-user")
+		}
+		if err := syncUserDirectory(flagTarget, baseDir, flagDryRun); err != nil {
+			log.Fatalf("USER sync failed: %v", err)
+		}
+		fmt.Println("USER sync complete")
 		return
 	}
 
@@ -225,6 +239,59 @@ func getTargetMemoryPath(target, baseDir string) string {
 	default:
 		return filepath.Join(baseDir, "MEMORY", "warm")
 	}
+}
+
+func syncUserDirectory(targets string, baseDir string, dryRun bool) error {
+	targetList := parseTargets(targets)
+
+	userDirs := map[string]string{
+		"TELOS":    filepath.Join(baseDir, "USER", "TELOS"),
+		"Settings": filepath.Join(baseDir, "USER", "Settings"),
+	}
+
+	for _, target := range targetList {
+		targetPath := getTargetMemoryPath(target, baseDir)
+
+		if flagVerbose {
+			fmt.Printf("Syncing USER to %s: %s\n", target, targetPath)
+		}
+
+		if dryRun {
+			fmt.Printf("Would sync USER directory to %s\n", targetPath)
+			continue
+		}
+
+		if err := os.MkdirAll(targetPath, 0755); err != nil {
+			return err
+		}
+
+		for name, src := range userDirs {
+			if _, err := os.Stat(src); err != nil {
+				if flagVerbose {
+					fmt.Printf("Skipping %s: not found\n", name)
+				}
+				continue
+			}
+
+			dest := filepath.Join(targetPath, name)
+			if err := copyDir(src, dest); err != nil {
+				if flagVerbose {
+					fmt.Printf("Warning: Failed to sync %s: %v\n", name, err)
+				}
+			} else if flagVerbose {
+				fmt.Printf("Synced: %s -> %s\n", name, dest)
+			}
+		}
+
+		// Write sync manifest
+		manifest := fmt.Sprintf("# USER Sync Manifest\n\nTarget: %s\nTimestamp: %s\nSynced directories:\n", target, time.Now().Format("2006-01-02 15:04"))
+		for name := range userDirs {
+			manifest += fmt.Sprintf("- %s\n", name)
+		}
+		os.WriteFile(filepath.Join(targetPath, "sync-manifest.md"), []byte(manifest), 0644)
+	}
+
+	return nil
 }
 
 func backupAllSessions(baseDir string, dryRun bool) error {
