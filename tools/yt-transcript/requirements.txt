@@ -1,0 +1,4 @@
+faster-whisper>=1.0.0
+openai>=1.0.0
+google-cloud-speech
+requests>=2.0.0
