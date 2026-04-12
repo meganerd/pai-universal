@@ -19,7 +19,7 @@ go build -o yt-transcript ./tools/yt-transcript
 # Get transcript (prefers YouTube captions, falls back to Whisper)
 ./yt-transcript --url "https://youtube.com/watch?v=..."
 
-# Output to file
+# Output to file (use -o, not --output)
 ./yt-transcript --url "URL" -o transcript.txt
 
 # Use different provider (default: openai)
