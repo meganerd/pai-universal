@@ -19,6 +19,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 )
 
 var (
@@ -142,26 +143,31 @@ func downloadAudio(url string) (string, error) {
 		return "", fmt.Errorf("invalid URL")
 	}
 
-	tempTemplate := fmt.Sprintf("/tmp/yt-audio-%s.%%(ext)s", videoID)
+	// Use current directory
+	cwd, _ := os.Getwd()
+	audioPath := filepath.Join(cwd, "audio.webm")
+
+	// Clean up first
+	os.Remove(audioPath)
+	os.Remove(audioPath + ".part")
 
 	cmd := exec.Command("yt-dlp",
 		"-f", "bestaudio",
-		"--output", tempTemplate,
-		"--force-overwrite",
-		"--print", "filename",
+		"--output", audioPath,
 		url,
 	)
-	output, _ := cmd.CombinedOutput()
-	lines := strings.Split(string(output), "\n")
-	audioPath := strings.TrimSpace(lines[len(lines)-1])
+	cmd.Stdout = os.Stderr
+	cmd.Stderr = os.Stderr
 
-	if audioPath != "" && strings.HasPrefix(audioPath, "/tmp") {
-		if _, err := os.Stat(audioPath); err == nil {
-			return audioPath, nil
-		}
+	if err := cmd.Run(); err != nil {
+		fmt.Printf("[yt-transcript] yt-dlp error: %v\n", err)
 	}
 
-	fmt.Printf("[yt-transcript] yt-dlp output: %s\n", string(output))
+	time.Sleep(500 * time.Millisecond)
+
+	if _, err := os.Stat(audioPath); err == nil {
+		return audioPath, nil
+	}
 	return "", fmt.Errorf("no audio file created for video: %s", videoID)
 }
 
