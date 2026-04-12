@@ -11,6 +11,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -211,25 +212,29 @@ func transcribeOpenAI(audioPath string) (string, error) {
 		return "", fmt.Errorf("OPENAI_API_KEY not set")
 	}
 
-	cmd := exec.Command("openai", "audio", "transcriptions", "create",
-		"--file", audioPath,
-		"--model", "whisper-1",
-		"--response-format", "text",
-		"--api-key", apiKey,
+	// Use curl to call the OpenAI API
+	cmd := exec.Command("curl", "-s", "-X", "POST",
+		"https://api.openai.com/v1/audio/transcriptions",
+		"-H", "Authorization: Bearer "+apiKey,
+		"-F", "file=@"+audioPath,
+		"-F", "model=whisper-1",
 	)
-	cmd.Stdout = os.Stderr
-	cmd.Stderr = os.Stderr
-
-	if err := cmd.Run(); err != nil {
-		return "", err
-	}
-
-	data, err := os.ReadFile(audioPath[:len(audioPath)-len(filepath.Ext(audioPath))] + ".txt")
+	output, err := cmd.Output()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("API call failed: %v - output: %s", err, string(output))
 	}
 
-	return string(data), nil
+	// Parse JSON response to extract text
+	var result map[string]interface{}
+	if err := json.Unmarshal(output, &result); err != nil {
+		return "", fmt.Errorf("failed to parse response: %v - output: %s", err, string(output))
+	}
+
+	if text, ok := result["text"].(string); ok {
+		return text, nil
+	}
+
+	return string(output), nil
 }
 
 func writeOutput(content string) error {
