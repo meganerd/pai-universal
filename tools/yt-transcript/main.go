@@ -155,9 +155,13 @@ func downloadAudio(url string) (string, error) {
 	lines := strings.Split(string(output), "\n")
 	audioPath := strings.TrimSpace(lines[len(lines)-1])
 
-	if audioPath == "" || !strings.HasPrefix(audioPath, "/tmp") {
-		fmt.Printf("[yt-transcript] yt-dlp output: %s\n", string(output))
+	if audioPath != "" && strings.HasPrefix(audioPath, "/tmp") {
+		if _, err := os.Stat(audioPath); err == nil {
+			return audioPath, nil
+		}
 	}
+
+	fmt.Printf("[yt-transcript] yt-dlp output: %s\n", string(output))
 	return "", fmt.Errorf("no audio file created for video: %s", videoID)
 }
 
