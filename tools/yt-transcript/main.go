@@ -137,36 +137,28 @@ func getYouTubeSubtitles(url string) (string, error) {
 }
 
 func downloadAudio(url string) (string, error) {
-	tmpDir, err := os.MkdirTemp("", "yt-audio-")
-	if err != nil {
-		return "", err
+	videoID := extractVideoID(url)
+	if videoID == "" {
+		return "", fmt.Errorf("invalid URL")
 	}
 
-	audioPath := filepath.Join(tmpDir, "audio.mp3")
+	tempTemplate := fmt.Sprintf("/tmp/yt-audio-%s.%%(ext)s", videoID)
 
 	cmd := exec.Command("yt-dlp",
-		"-x", "--audio-format", "mp3",
-		"--output", audioPath,
+		"-f", "bestaudio",
+		"--output", tempTemplate,
+		"--force-overwrite",
+		"--print", "filename",
 		url,
 	)
-	cmd.Stdout = os.Stderr
-	cmd.Stderr = os.Stderr
+	output, _ := cmd.CombinedOutput()
+	lines := strings.Split(string(output), "\n")
+	audioPath := strings.TrimSpace(lines[len(lines)-1])
 
-	if err := cmd.Run(); err != nil {
-		os.RemoveAll(tmpDir)
-		return "", err
+	if audioPath == "" || !strings.HasPrefix(audioPath, "/tmp") {
+		fmt.Printf("[yt-transcript] yt-dlp output: %s\n", string(output))
 	}
-
-	if _, err := os.Stat(audioPath); err != nil {
-		os.RemoveAll(tmpDir)
-		return "", fmt.Errorf("no audio file created")
-	}
-
-	audioPath, _ = filepath.Abs(audioPath)
-	audioPath = audioPath[:len(audioPath)-len(".mp3")]
-	os.Rename(audioPath+".mp3", audioPath+".mp3")
-
-	return audioPath + ".mp3", nil
+	return "", fmt.Errorf("no audio file created for video: %s", videoID)
 }
 
 func transcribeLocal(audioPath string) (string, error) {
