@@ -5,40 +5,54 @@ Get YouTube video transcript or transcribe via Whisper.
 ## Installation
 
 ```bash
-pip install --user faster-whisper openai requests
+go install ./tools/yt-transcript
+```
+
+Or build locally:
+```bash
+go build -o yt-transcript ./tools/yt-transcript
 ```
 
 ## Usage
 
 ```bash
 # Get transcript (prefers YouTube captions, falls back to Whisper)
-python yt_transcript.py "https://youtube.com/watch?v=..."
+./yt-transcript --url "https://youtube.com/watch?v=..."
 
-# Specify output file
-python yt_transcript.py "URL" -o transcript.txt
+# Output to file
+./yt-transcript --url "URL" -o transcript.txt
 
-# Use different provider
-python yt_transcript.py "URL" --provider openai    # OpenAI Whisper API
-python yt_transcript.py "URL" --provider local     # Local faster-whisper (default)
-python yt_transcript.py "URL" --provider google     # Google Cloud Speech-to-Text
-python yt_transcript.py "URL" --provider assemblyai  # AssemblyAI
+# Use different provider (default: openai)
+./yt-transcript --url "URL" --provider openai
+
+# Use local Whisper (requires whisper CLI installed)
+./yt-transcript --url "URL" --provider local --model base
+
+# Verbose
+./yt-transcript --url "URL" -v
 ```
 
 ## Providers
 
-- `local` (default): faster-whisper - runs locally, free once model downloaded
-- `openai`: OpenAI Whisper API - paid per minute, requires OPENAI_API_KEY
-- `google`: Google Cloud Speech-to-Text - paid, requires GOOGLE_APPLICATION_CREDENTIALS
-- `assemblyai`: AssemblyAI - paid, requires ASSEMBLYAI_API_KEY
+- `openai` (default): Uses OpenAI Whisper API, requires `OPENAI_API_KEY` env var
+- `local`: Uses `whisper` CLI (must be installed separately)
 
-## Environment Variables
+## Requirements
 
-- `OPENAI_API_KEY` - for OpenAI provider
-- `GOOGLE_APPLICATION_CREDENTIALS` - for Google provider  
-- `ASSEMBLYAI_API_KEY` - for AssemblyAI provider
+- `yt-dlp` - for downloading audio
+- For OpenAI provider: `OPENAI_API_KEY` env var
+- For local provider: `whisper` CLI (https://github.com/openai/whisper)
 
 ## Priority
 
 1. Try YouTube auto-generated captions
-2. Try YouTube manually created captions
-3. Fall back to Whisper transcription (configurable provider)
+2. Try YouTube manually created captions  
+3. Fall back to Whisper transcription
+
+## Flags
+
+- `--url` - YouTube URL (required)
+- `-o` - Output file (default: stdout)
+- `-v` - Verbose output
+- `--model` - Local Whisper model (tiny, base, small, medium, large)
+- `--provider` - Provider: openai (default), local
