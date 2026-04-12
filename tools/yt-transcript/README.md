@@ -22,10 +22,10 @@ go build -o yt-transcript ./tools/yt-transcript
 # Output to file (use -o, not --output)
 ./yt-transcript --url "URL" -o transcript.txt
 
-# Use different provider (default: openai)
+# Use OpenAI provider (requires OPENAI_API_KEY)
 ./yt-transcript --url "URL" --provider openai
 
-# Use local Whisper (requires whisper CLI installed)
+# Use local Whisper (default - requires whisper CLI installed)
 ./yt-transcript --url "URL" --provider local --model base
 
 # Verbose
@@ -34,14 +34,14 @@ go build -o yt-transcript ./tools/yt-transcript
 
 ## Providers
 
-- `openai` (default): Uses OpenAI Whisper API, requires `OPENAI_API_KEY` env var
-- `local`: Uses `whisper` CLI (must be installed separately)
+- `local` (default): Uses `whisper` CLI (must be installed separately)
+- `openai`: Uses OpenAI Whisper API, requires `OPENAI_API_KEY` env var
 
 ## Requirements
 
 - `yt-dlp` - for downloading audio
-- For OpenAI provider: `OPENAI_API_KEY` env var
 - For local provider: `whisper` CLI (https://github.com/openai/whisper)
+- For OpenAI provider: `OPENAI_API_KEY` env var
 
 ## Priority
 
@@ -54,5 +54,5 @@ go build -o yt-transcript ./tools/yt-transcript
 - `--url` - YouTube URL (required)
 - `-o` - Output file (default: stdout)
 - `-v` - Verbose output
-- `--model` - Local Whisper model (tiny, base, small, medium, large)
-- `--provider` - Provider: openai (default), local
+- `--model` - Local Whisper model (default: base)
+- `--provider` - Provider: local (default), openai
