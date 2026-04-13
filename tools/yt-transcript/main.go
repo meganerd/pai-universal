@@ -36,13 +36,13 @@ func main() {
 	flag.StringVar(&flagOutput, "o", "", "Output file (default: stdout)")
 	flag.BoolVar(&flagVerbose, "v", false, "Verbose output")
 	flag.StringVar(&flagModel, "model", "base", "Whisper model (tiny, base, small, medium, large)")
-	flag.StringVar(&flagProvider, "provider", "local", "Provider: local (default), openai")
+	flag.StringVar(&flagProvider, "provider", "openai", "Provider: openai (default), local")
 	flag.Parse()
 
 	// Show parameters
 	fmt.Printf("[yt-transcript] Parameters:\n")
 	fmt.Printf("[yt-transcript]   URL: %s\n", flagURL)
-	fmt.Printf("[yt-transcript]   Provider: %s (default: local)\n", flagProvider)
+	fmt.Printf("[yt-transcript]   Provider: %s (default: openai)\n", flagProvider)
 	fmt.Printf("[yt-transcript]   Model: %s (default: base)\n", flagModel)
 	if flagOutput != "" {
 		fmt.Printf("[yt-transcript]   Output: %s\n", flagOutput)

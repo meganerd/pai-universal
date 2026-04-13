@@ -34,8 +34,8 @@ go build -o yt-transcript ./tools/yt-transcript
 
 ## Providers
 
-- `local` (default): Uses `whisper` CLI (must be installed separately)
-- `openai`: Uses OpenAI Whisper API, requires `OPENAI_API_KEY` env var
+- `openai` (default): Uses OpenAI Whisper API, requires `OPENAI_API_KEY` env var
+- `local`: Uses `whisper` CLI (must be installed separately)
 
 ## Requirements
 
