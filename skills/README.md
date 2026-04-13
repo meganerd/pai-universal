@@ -18,6 +18,18 @@ The following PAI skills are already available in your opencode setup at `~/.cla
 - **Agents** — Custom agent composition
 - **Utilities** — CLI generation, skill scaffolding, Fabric patterns
 
+### PAIAlgorithm (pai-universal only)
+
+Located in `skills/PAIAlgorithm/` — available when working in pai-universal:
+
+- **PAIAlgorithm** — Structured decision-making framework for complex tasks
+  - `/analyze <prompt>` — Score complexity, recommend effort level
+  - `/prd` — Create new PRD in WORK/ directory
+  - `/phase <name>` — Transition Algorithm phase
+  - `/isc <criteria>` — Add ISC criterion to PRD
+
+See `PAIAlgorithm/SKILL.md` for full documentation.
+
 ## Customization
 
 To customize any skill, create overrides in `USER/Skills/`:

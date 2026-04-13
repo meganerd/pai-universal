@@ -7,11 +7,18 @@ This directory contains hooks and utilities for integrating PAI with various AI 
 ### Session Start Hook
 `session-start.sh` - Runs when entering a PAI session
 
+Usage:
+```bash
+./session-start.sh                    # Basic info only
+./session-start.sh "your prompt"     # Analyze complexity
+```
+
 Shows:
 - Recent sessions from MEMORY/warm/
 - Known patterns from MEMORY/cold/
 - Active goals from USER/TELOS/GOALS.md
 - Active projects from USER/TELOS/PROJECTS.md
+- Complexity analysis if prompt provided
 
 ### Session End Hook  
 `session-end.sh` - Runs when ending a PAI session
