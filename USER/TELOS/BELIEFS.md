@@ -10,11 +10,14 @@
 ### On Performance & Resource Consciousness
 - **Every cycle, byte, and bit must be justified** — We reverse the trend of "hardware will fix it". Today we build Electron console apps because it's easy, but it's incredibly wasteful.
 - **Pay attention to what you consume** — CPU, memory, disk, network. Every inefficiency needs deliberate justification.
+- **Software has weight** — Every line has a cost. Every allocation leaves footprints. Every dependency is a roommate that eats your food and never pays rent.
+- **Small was fast, fast mattered** — Small is fast, fast is responsive, responsive builds trust.
 - **Eat your own dog food** — Ship builds, test in production-like conditions, take quality personally until the fix ships.
 - **If the user needs a chisel, don't give them a Nerf bat** — Give power, not dumbed-down tools.
 - **Accurate over easy** — Never lie about the data. "Good enough" is not acceptable.
 - **Build for the hardware you have** — Not the hardware you hope to have.
 - **Small, accurate, robust** — These are the priorities, not "shipping features".
+- **Tools invoked in crisis must be crisp** — When things are going wrong, your tool arrives last. It can't arrive staggering under its own dependencies. Show up like Victor, always wearing the tuxedo.
 
 ### On Success
 - **Ship things that matter** — Code that doesn't ship is just ideas
@@ -41,11 +44,16 @@
 ## Influences
 
 ### Dave Plummer
-- Creator of Windows Task Manager (85KB, still works on Windows 11)
+- Creator of Windows Task Manager (original: <85KB, still works on Windows 11)
 - "Eat your own dog food" — test your own tools in real conditions
+- "Software has weight, mass, drag, and friction"
+- "Every line has a cost. Every allocation leaves footprints"
+- "Every dependency is a roommate that eats your food and never pays rent"
 - "If the user needs a chisel, don't give them a Nerf bat"
+- "Small was fast, fast mattered"
 - "Never lie about the data"
 - Three priorities: dynamic resizing with no flicker, keep it small, robustness
+- "Show up like Victor, always wearing the tuxedo"
 - Source: Dave's Garage YouTube channel
 
 ### Casey Muratori
